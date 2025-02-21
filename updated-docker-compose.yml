@@ -1,0 +1,44 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx-docker-file
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./modsecurity.conf:/etc/nginx/modsecurity.conf
+      - ./modsecurity/:/etc/nginx/modsecurity/
+    depends_on:
+      - waf
+
+  waf:
+    build:
+      context: .
+      dockerfile: waf-docker-file
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/
+
+  webgoat:
+    image: webgoat/webgoat-8.0
+    ports:
+      - "8080:8080"
+
+  mongo:
+    image: mongo:4.4
+    ports:
+      - "27017:27017"
+  zap:
+    image: owasp/zap2docker-stable
+    ports:
+      - "8082:8080"  # ZAP API and UI
+    environment:
+      - ZAP_API_KEY=changeme  # Set a secure API key
+    command: zap.sh -daemon -port 8080 -host 0.0.0.0 -config api.key=changeme
+    depends_on:
+      - webgoat

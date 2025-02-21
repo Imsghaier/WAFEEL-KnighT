@@ -1,0 +1,14 @@
+ #Load ModSecurity module
+LoadModule security3_module modules/mod_security3.so
+
+# Include OWASP CRS rules
+Include /etc/nginx/modsecurity/crs/crs-setup.conf
+Include /etc/nginx/modsecurity/crs/rules/*.conf
+
+# Basic configuration
+SecRuleEngine On
+SecRequestBodyAccess On
+SecResponseBodyAccess On
+SecDataDir /tmp
+SecTmpDir /tmp
+SecAuditLog /var/log/modsecurity/audit.log

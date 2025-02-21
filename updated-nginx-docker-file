@@ -1,0 +1,12 @@
+FROM nginx:latest
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    libmodsecurity3 libnginx-mod-security
+
+# Copy Nginx and ModSecurity configuration files
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY modsecurity.conf /etc/nginx/modsecurity.conf
+COPY modsecurity /etc/nginx/modsecurity/
+
+# Enable ModSecurity in Nginx
+RUN echo 'include /etc/nginx/modsecurity.conf;' >> /etc/nginx/nginx.conf

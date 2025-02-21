@@ -1,0 +1,37 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx-docker-file
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - waf
+
+  waf:
+    build:
+      context: .
+      dockerfile: waf-docker-file
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/
+
+  webgoat:
+    image: webgoat/webgoat-8.0
+    ports:
+      - "8080:8080"
+
+  mongo:
+    image: mongo:4.4
+    ports:
+      - "27017:27017"
+
+  
+
+
